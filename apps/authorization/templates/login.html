@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro e Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        .welcome-message {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body class="bg-light">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-12">
+                <p class="welcome-message">Bem Vindo(a) ao SIOM, Sistema de Ocorrências Municipais</p>
+            </div>
+            <div class="col-md-6 mx-auto" style="display: none;">
+                <h1>Registrar</h1>
+                <div class="alert alert-danger" id="registerError" style="display: none;"></div>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerUsername">Nome de usuário</label>
+                        <input type="text" class="form-control" id="registerUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Senha</label>
+                        <input type="password" class="form-control" id="registerPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                </form>
+                <a href="#" id="showLogin">Já tem uma conta? Faça login</a>
+            </div>
+            <div class="col-md-6 mx-auto">
+                <h1>Login</h1>
+                <div class="alert alert-danger" id="loginError" style="display: none;"></div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginUsername">Nome de usuário</label>
+                        <input type="text" class="form-control" id="loginUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Senha</label>
+                        <input type="password" class="form-control" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <a href="#" id="showRegister">Não tem uma conta? Registre-se</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#showRegister').on('click', function(e) {
+            e.preventDefault();
+            $('#loginForm').parent().hide();
+            $('#registerForm').parent().show();
+        });
+
+        $('#showLogin').on('click', function(e) {
+            e.preventDefault();
+            $('#registerForm').parent().hide();
+            $('#loginForm').parent().show();
+        });
+
+        $('#registerForm').on('submit', function(e) {
+            e.preventDefault();
+            var username = $('#registerUsername').val();
+            var password = $('#registerPassword').val();
+            $.post('/siom/api/register/', {username: username, password: password})
+                .done(function() {
+                    alert('Registrado com sucesso!');
+                    $('#registerForm').parent().hide();
+                    $('#loginForm').parent().show();
+                })
+                .fail(function() {
+                    $('#registerError').text('Erro ao registrar.').show();
+                });
+        });
+
+        $('#loginForm').on('submit', function(e) {
+            e.preventDefault();
+            var username = $('#loginUsername').val();
+            var password = $('#loginPassword').val();
+            $.post('/siom/api/login/', {username: username, password: password})
+                .done(function() {
+                    window.location.href = 'http://localhost:8000/siom/api/occurrences-page/';
+                })
+                .fail(function() {
+                    $('#loginError').text('Nome de usuário ou senha incorretos.').show();
+                });
+        });
+    </script>
+</body>
+</html>

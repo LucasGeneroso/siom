@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ocorrências</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        .required:after {
+            content:" *";
+            color: red;
+        }
+        .required-text {
+            color: red;
+        }
+        .zoom {
+            transition: transform .2s;
+        }
+        .zoom:hover {
+            transform: scale(1.2);
+        }
+        #imageModal .modal-content {
+            background: transparent;
+            border: none;
+        }
+        #imageModal .close {
+            color: #999;
+            position: absolute;
+            right: -4px;
+            top: -11px;
+            z-index: 9999;
+        }
+        .cursor-pointer {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .cursor-pointer:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body class="bg-light">
+    <br></br>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-right">
+                <a href="/siom/api/logout" class="btn btn-primary" role="button">LogOff</a>
+            </div>
+        </div>
+    </div>
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-9.5 mx-auto">
+                <h1 class="mb-3">Ocorrências</h1>
+                <button type="button" class="btn btn-primary float-right mb-3" data-toggle="modal" data-target="#occurrenceModal">
+                    Adicionar ocorrência
+                </button>
+                <p>
+                    Aqui você pode visualizar e adicionar ocorrências.
+                </p>
+                <div class="input-group mb-3">
+                    <input id="search" type="text" class="form-control" placeholder="Buscar..." />
+                    <div class="input-group-append">
+                        <select id="filter" class="custom-select">
+                            <option value="">Todos os tipos</option>
+                            <option value="fallen_tree">Árvore caída</option>
+                            <option value="rubble">Entulho</option>
+                            <option value="broken_cable">Cabo Rompido</option>
+                            <option value="public_lighting">Iluminação Pública</option>
+                            <option value="asphalt">Asfalto</option>
+                            <option value="flooding">Alagamento</option>
+                            <option value="high_grass">Mato Alto</option>
+                            <option value="zoonoses">Zoonoses</option>
+                            <option value="robbery">Assalto/Roubo</option>
+                            <option value="sewer">Esgoto</option>
+                            <option value="loud_noise">Som Alto</option>
+                            <option value="illegal_fire">Incêndio Clandestino</option>
+                            <!-- Adicione mais opções conforme necessário -->
+                        </select>
+                        <select id="neighborhoodFilter" class="custom-select">
+                            <option value="">Todos os Bairros</option>
+                            <!-- As outras opções serão preenchidas dinamicamente -->
+                        </select>
+                        <select id="yearFilter" class="custom-select">
+                            <option value="">Todos os Anos</option>
+                            <!-- As outras opções serão preenchidas dinamicamente -->
+                        </select>
+                        <select id="monthFilter" class="custom-select">
+                            <option value="">Todos os Meses</option>
+                            <option value="01">Janeiro</option>
+                            <option value="02">Fevereiro</option>
+                            <option value="03">Março</option>
+                            <option value="04">Abril</option>
+                            <option value="05">Maio</option>
+                            <option value="06">Junho</option>
+                            <option value="07">Julho</option>
+                            <option value="08">Agosto</option>
+                            <option value="09">Setembro</option>
+                            <option value="10">Outubro</option>
+                            <option value="11">Novembro</option>
+                            <option value="12">Dezembro</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="occurrences" class="card mb-3 cursor-pointer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="alertModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alertModalLabel">Atenção</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="alertModalBody">
+                    <!-- Aqui será inserida a mensagem de alerta -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="occurrenceModal" tabindex="-1" role="dialog" aria-labelledby="occurrenceModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="occurrenceModalLabel">Adicionar ocorrência</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="occurrenceForm">
+                        <p class="required-text">Os campos marcados com * são obrigatórios.</p>
+                        <div class="form-group">
+                            <label for="type" class="required">Tipo</label>
+                            <select class="form-control" id="type" required>
+                                <option value="">Selecione o tipo</option>
+                                <option value="fallen_tree">Árvore caída</option>
+                                <option value="rubble">Entulho</option>
+                                <option value="broken_cable">Cabo Rompido</option>
+                                <option value="public_lighting">Iluminação Pública</option>
+                                <option value="asphalt">Asfalto</option>
+                                <option value="flooding">Alagamento</option>
+                                <option value="high_grass">Mato Alto</option>
+                                <option value="zoonoses">Zoonoses</option>
+                                <option value="robbery">Assalto/Roubo</option>
+                                <option value="sewer">Esgoto</option>
+                                <option value="loud_noise">Som Alto</option>
+                                <option value="illegal_fire">Incêndio Clandestino</option>
+                                <!-- Adicione mais opções conforme necessário -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="city" class="required">Cidade</label>
+                            <input type="text" class="form-control" id="city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="state" class="required">Estado</label>
+                            <input type="text" class="form-control" id="state" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="neighborhood" class="required">Bairro</label>
+                            <input type="text" class="form-control" id="neighborhood" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="street" class="required">Rua</label>
+                            <input type="text" class="form-control" id="street" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="number" class="required">Número</label>
+                            <input type="text" class="form-control" id="number" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="complement">Complemento</label>
+                            <input type="text" class="form-control" id="complement">
+                        </div>
+                        <div class="form-group">
+                            <label for="description" class="required">Descrição</label>
+                            <textarea class="form-control" id="description" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="reported_by">Reportado por</label>
+                            <input type="text" class="form-control" id="reported_by" value="Anônimo">
+                        </div>
+                        <div class="form-group">
+                            <label for="image">Imagem (Apenas uma por ocorrência)</label>
+                            <input type="file" class="form-control-file" id="image" accept="image/*">
+                        </div>
+                        <!-- Adicione mais campos de acordo com o seu body -->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="saveOccurrence">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form id="occurrenceForm" enctype="multipart/form-data"></form>
+
+    
+    <div class="modal fade" id="detailOccurrenceModal" tabindex="-1" role="dialog" aria-labelledby="detailOccurrenceModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailOccurrenceModalLabel">Detalhes da ocorrência</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Aqui serão inseridos os detalhes da ocorrência -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <!-- Aqui será inserida a imagem -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script>
+        var occurrences = [];
+
+        $(document).ready(function() {
+            $.getJSON('/siom/api/occurrences', function(data) {
+                occurrences = data;
+                displayOccurrences(data);
+
+                // Preencha as opções do filtro de bairro
+                var neighborhoods = [...new Set(data.map(occurrence => occurrence.neighborhood))];
+                neighborhoods.forEach(function(neighborhood) {
+                    $('#neighborhoodFilter').append(new Option(neighborhood, neighborhood));
+                });
+
+                // Preencha as opções do filtro de ano
+                var years = [...new Set(occurrences.map(occurrence => new Date(occurrence.date).getFullYear()))];
+                years.forEach(function(year) {
+                    $('#yearFilter').append(new Option(year, year));
+                });
+            });
+
+            $('#search').on('input', function() {
+                var search = $(this).val().toLowerCase();
+                var filteredOccurrences = occurrences.filter(function(occurrence) {
+                    return occurrence.description.toLowerCase().includes(search);
+                });
+                displayOccurrences(filteredOccurrences);
+            });
+
+            $('#filter').on('change', function() {
+                var filter = $(this).val();
+                var filteredOccurrences = occurrences.filter(function(occurrence) {
+                    return filter === '' || occurrence.type === filter;
+                });
+                displayOccurrences(filteredOccurrences);
+            });
+
+            $('#neighborhoodFilter').on('change', function() {
+                var neighborhood = $(this).val();
+                var filteredOccurrences = occurrences.filter(function(occurrence) {
+                    return neighborhood === '' || occurrence.neighborhood === neighborhood;
+                });
+                displayOccurrences(filteredOccurrences);
+            });
+
+            $('#yearFilter').on('change', function() {
+                var year = $(this).val();
+                var filteredOccurrences = occurrences.filter(function(occurrence) {
+                    return year === '' || new Date(occurrence.date).getFullYear().toString() === year;
+                });
+                displayOccurrences(filteredOccurrences);
+            });
+
+            $('#monthFilter').on('change', function() {
+                var month = $(this).val();
+                var filteredOccurrences = occurrences.filter(function(occurrence) {
+                    return month === '' || (new Date(occurrence.date).getMonth() + 1).toString().padStart(2, '0') === month;
+                });
+                displayOccurrences(filteredOccurrences);
+            });
+
+            $('#alertModal').on('show.bs.modal', function (e) {
+                var zIndex = 1040 + (10 * $('.modal:visible').length);
+                $(this).css('z-index', zIndex);
+                setTimeout(function() {
+                    $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+                }, 0);
+            });
+
+            $('#saveOccurrence').on('click', function(e) {
+                e.preventDefault();
+                
+                var form = document.getElementById('occurrenceForm');
+                if (!form.checkValidity()) {
+                    // Fechar o modal do formulário
+                    $('#occurrenceModal').modal('hide');
+
+                    // Abrir o modal de alerta
+                    $('#alertModalBody').text('Por favor, preencha todos os campos obrigatórios.');
+                    $('#alertModal').modal('show');
+
+                    // Reabrir o modal do formulário quando o modal de alerta for fechado
+                    $('#alertModal').on('hidden.bs.modal', function (e) {
+                        $('#occurrenceModal').modal('show');
+                    });
+
+                    return false;
+                }
+
+                var formData = new FormData();
+                formData.append('type', $('#type').val());
+                formData.append('city', $('#city').val());
+                formData.append('state', $('#state').val());
+                formData.append('neighborhood', $('#neighborhood').val());
+                formData.append('street', $('#street').val());
+                formData.append('number', $('#number').val());
+                var complement = $('#complement').val();
+                if (complement) {
+                    formData.append('complement', complement);
+                }
+                formData.append('description', $('#description').val());
+                formData.append('reported_by', $('#reported_by').val());
+                var imageFile = $('#image')[0].files[0];
+                if (imageFile) {
+                    formData.append('image', imageFile);
+                }
+
+                $.ajax({
+                    url: '/siom/api/occurrences/',
+                    method: 'POST',
+                    data: formData,
+                    contentType: false, // Necessário para enviar dados binários
+                    processData: false, // Necessário para enviar dados binários
+                    beforeSend: function(xhr, settings) {
+                        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                    },
+                    success: function() {
+                        $('#occurrenceModal').modal('hide');
+                        location.reload();
+                    }
+                });
+            });
+        });
+
+        // Função para obter o cookie CSRF
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        var typeTranslations = {
+            "fallen_tree": "Árvore caída",
+            "rubble": "Entulho",
+            "broken_cable": "Cabo Rompido",
+            "public_lighting": "Iluminação Pública",
+            "asphalt": "Asfalto",
+            "flooding": "Alagamento",
+            "high_grass": "Mato Alto",
+            "zoonoses": "Zoonoses",
+            "robbery": "Assalto/Roubo",
+            "sewer": "Esgoto",
+            "loud_noise": "Som Alto",
+            "illegal_fire": "Incêndio Clandestino"
+            // Adicione mais traduções conforme necessário
+        };
+
+        $(document).on('click', '#occurrenceImage', function() {
+            var imgSrc = $(this).attr('src');
+            $('#imageModal .modal-body').html('<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"><span aria-hidden="true">&times;</span></button><img src="' + imgSrc + '" class="img-fluid">');
+            $('#imageModal').modal('show');
+        });
+
+        function displayOccurrences(data) {
+            $('#occurrences').empty();
+            $.each(data, function(key, val) {
+                var translatedType = typeTranslations[val.type] || val.type;
+                var date = new Date(val.date).toLocaleString('pt-BR');
+                var occurrenceId = 'occurrence-' + key;
+                $('#occurrences').append('<div id="' + occurrenceId + '" class="card mb-3"><div class="card-body"><h5 class="card-title">' + translatedType + '</h5><h6 class="card-subtitle mb-2 text-muted">Reportado por: ' + val.reported_by + '</h6><p class="card-text">' + val.description + '</p><p class="card-text"><small class="text-muted">Endereço: ' + val.street + ', ' + val.number + ', ' + val.neighborhood + ', ' + val.city + ', ' + val.state + '</small></p><p class="card-text"><small class="text-muted">Data: ' + date + '</small></p></div></div>');
+                
+                $('#' + occurrenceId).on('click', function() {
+                    $('#detailOccurrenceModalLabel').text(translatedType);
+                    var modalBody = '<p><b>Reportado por:</b> ' + val.reported_by + '</p><p>' + val.description + '</p><p><b>Endereço:</b> ' + val.street + ', ' + val.number + ', ' + val.neighborhood + ', ' + val.city + ', ' + val.state + '</p><p><b>Data:</b> ' + date + '</p>';
+
+                    // Verifique se a ocorrência tem uma imagem
+                    if (val.image) {
+                        // Adicione a imagem ao corpo do modal
+                        modalBody += '<img src="' + val.image + '" alt="Imagem da ocorrência" class="img-fluid zoom" id="occurrenceImage">';
+                    }
+
+                    $('#detailOccurrenceModal .modal-body').html(modalBody);
+                    $('#detailOccurrenceModal').modal('show');
+                });
+            });
+        }
+    </script>
+</body>
+</html>

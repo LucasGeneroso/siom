@@ -1,0 +1,16 @@
+*.pyc
+__pycache__/
+*.sqlite3
+.coverage
+build/
+dist/
+*.egg-info
+.mypy_cache/
+*env/
+.vscode
+static
+.DS_Store
+pretty.output
+database/
+/media
+/venv

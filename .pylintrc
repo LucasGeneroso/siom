@@ -1,0 +1,17 @@
+[MASTER]
+
+# Excluir arquivos e diretórios do Django
+ignore-patterns=migrations,admin.py,models.py
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-many-ancestors,
+    line-too-long,
+    invalid-name,
+    too-few-public-methods,
+    invalid-str-returned,
+    no-member,
+    import-outside-toplevel
