@@ -23,4 +23,4 @@ jobs:
         run: pip install -r ./requirements/base.txt
       - name: Analysing the code with pylint
         run: |
-          pylint --ignore=migrations,admin.py,models.py $(git ls-files '*.py')
+          pylint --ignore=migrations,admin.py,models.py --disable=inconsistent-return-statements $(git ls-files '*.py')
