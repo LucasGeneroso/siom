@@ -14,7 +14,6 @@ class Occurrence(models.Model):
         ('sewer', 'Esgoto'),
         ('loud_noise', 'Som Alto'),
         ('illegal_fire', 'Incêndio Clandestino'),
-        # acidente de transito?
     )
 
     type = models.CharField(max_length=50, choices=TYPE_CHOICES)
