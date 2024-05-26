@@ -25,4 +25,4 @@ jobs:
         run: pip install -r requirements/base.txt
 
       - name: Run tests
-        run: pytest apps/occurence/tests/
+        run: pytest -v apps/occurrence/tests/
