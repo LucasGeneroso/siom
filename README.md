@@ -9,10 +9,10 @@ The aim of this system is to facilitate the reporting and management of occurren
 ## Installation
 
 1. Clone this repository.
-2. Create a virtual environment and activate it.
-3. Install the dependencies with `pip install -r requirements.txt`.
-4. Run the migrations with `python manage.py makemigrations` and `python manage.py migrate`.
-5. Start the development server with `python manage.py runserver`.
+2. Enter the project directory with `cd siom`.
+3. Run `make build` to build the Docker image.
+4. Run `make run` to start the Docker container.
+5. Run the migrations with `make migrations` and `make migrate`.
 
 ## Usage
 

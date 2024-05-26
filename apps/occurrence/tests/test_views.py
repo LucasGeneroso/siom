@@ -14,7 +14,7 @@ class TestOccurrenceViewSet(TestCase):
         self.user = User.objects.create_user(username="user_teste", email="test@test.com", password="teste123")
         self.refresh_token = RefreshToken.for_user(self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.refresh_token.access_token}")
-        Occurrence.objects.create(type="broken_cable", city="Cidade Teste", state="Estado Teste", neighborhood="Bairro Teste", 
+        Occurrence.objects.create(type="broken_cable", city="Cidade Teste", state="Estado Teste", neighborhood="Bairro Teste",
                                   street="Rua Teste", number=123, description="Descrição de teste", reported_by="Anônimo")
 
     def test_list_view(self):

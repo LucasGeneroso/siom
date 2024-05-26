@@ -10,7 +10,7 @@ def register(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
-        user = User.objects.create_user(username, password=password)
+        User.objects.create_user(username, password=password)
         return JsonResponse({"message": "Registrado com sucesso!"})
 
 
@@ -23,8 +23,7 @@ def login_view(request):
         if user is not None:
             login(request, user)
             return JsonResponse({"message": "Login bem-sucedido!"})
-        else:
-            return JsonResponse({"error": "Nome de usuário ou senha incorretos."}, status=400)
+        return JsonResponse({"error": "Nome de usuário ou senha incorretos."}, status=400)
 
 
 def logout_view(request):

@@ -9,7 +9,7 @@ router.register("occurrences", OccurenceViewSet)
 
 api_router = [
     path("", include(router.urls)),
-    path("occurrences-page/", 
-         ProtectedTemplateView.as_view(template_name="occurrences.html"), 
+    path("occurrences-page/",
+         ProtectedTemplateView.as_view(template_name="occurrences.html"),
          name='occurrences-page'),
 ]
