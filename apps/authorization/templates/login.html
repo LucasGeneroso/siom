@@ -89,7 +89,7 @@
             var password = $('#loginPassword').val();
             $.post('/siom/api/login/', {username: username, password: password})
                 .done(function() {
-                    window.location.href = 'http://localhost:8000/siom/api/occurrences-page/';
+                    window.location.href = '/siom/api/occurrences-page/';
                 })
                 .fail(function() {
                     $('#loginError').text('Nome de usuário ou senha incorretos.').show();
