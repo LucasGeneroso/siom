@@ -26,3 +26,37 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+## FrontEnd Pictures
+
+### Login Page
+![Login Page](images/login.png)
+
+### Register Page
+![Register Page](images/register.png)
+
+### Home Page
+![Home Page](images/home.png)
+
+### Detail Page
+![Detail Page](images/detail.png)
+
+### Occurrence Page
+![Occurrence Page](images/occurrence.png)
+
+## API Pictures
+
+### Home Page
+![API Home](images/api.png)
+
+### Occurrence
+![Occurrence](images/occurrence-api.png)
+
+### Token
+![Token](images/token.png)
+
+### Refresh Token
+![Refresh](images/refresh.png)
+
+### Verify Token
+![Verify](images/verify.png)
