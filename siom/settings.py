@@ -26,7 +26,7 @@ LOGIN_URL = '/siom/login-page/'
 SECRET_KEY = 'django-insecure-spf)fh*cepuc%csg=6e#*z==_a)d@k5kv797y^4m&(vu^jy6&z'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'localhost',
